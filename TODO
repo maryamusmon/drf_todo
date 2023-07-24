@@ -1,0 +1,13 @@
+Tasks
+- title
+- description
+- task_type
+- author
+- board
+
+Subtask
+name
+task
+
+board
+name
