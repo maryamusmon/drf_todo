@@ -1,30 +1,21 @@
-from django.shortcuts import render
-from rest_framework import generics, status
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
+from rest_framework import generics
 
-from tasks.models import Tasks, Board
-from tasks.serializer import TasksModelSerializer, BoardModelSerializer
+from tasks.models import Board, Column, Tasks
+from tasks.serializer import BoardModelSerializer, ColumnModelSerializer, TaskModelSerializer
 
 
-class TasksModelViewSet(ModelViewSet):
+class BoardListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Board.objects.all()
+    serializer_class = BoardModelSerializer
+
+
+class ColumnListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Column.objects.all()
+    serializer_class = ColumnModelSerializer
+
+
+class TaskListCreateAPIView(generics.ListCreateAPIView):
     queryset = Tasks.objects.all()
-    serializer_class = TasksModelSerializer
-
-
-class BoardListAPIView(APIView):
-    def get(self, request, *args, **kwargs):
-        tasks = Tasks.objects.all()
-        serializer = BoardModelSerializer(tasks, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    # def put(self, request, pk, format=None):
-    #     task = Board.objects.get(pk)
-    #     serializer = BoardModelSerializer(task, data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer_class = TaskModelSerializer
 
 

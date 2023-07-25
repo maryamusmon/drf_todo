@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.db.models import Model, CharField, TextField, TextChoices, ForeignKey, CASCADE
+from django.db.models import Model, CharField, TextField, ForeignKey, CASCADE, BooleanField
 
 
 class Board(Model):
@@ -9,17 +9,16 @@ class Board(Model):
         return self.name
 
 
-class Tasks(Model):
-    class TypeChoices(TextChoices):
-        TODO = 'todo', 'Todo'
-        DOING = 'doing', 'Doing'
-        DONE = 'done', 'Done'
+class Column(Model):
+    name = CharField(max_length=200)
+    board = ForeignKey(Board, CASCADE)
 
+
+class Tasks(Model):
     title = CharField(max_length=200)
     description = TextField(blank=True, null=True)
-    task_type = CharField(max_length=200, choices=TypeChoices.choices, default=TypeChoices.TODO)
-    board = ForeignKey(Board, CASCADE)
-    author = ForeignKey(User, CASCADE)
+
+    status = ForeignKey(Column, CASCADE)
 
     class Meta:
         db_table = 'tasks'
@@ -32,9 +31,5 @@ class Tasks(Model):
 
 class Subtasks(Model):
     name = CharField(max_length=200)
+    is_completed = BooleanField(default=False)
     task = ForeignKey(Tasks, CASCADE)
-
-
-class Column(Model):
-    name = CharField(max_length=200)
-    board = ForeignKey(Board, CASCADE)
