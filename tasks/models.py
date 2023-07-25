@@ -16,11 +16,10 @@ class Tasks(Model):
         DONE = 'done', 'Done'
 
     title = CharField(max_length=200)
-    description = TextField()
+    description = TextField(blank=True, null=True)
     task_type = CharField(max_length=200, choices=TypeChoices.choices, default=TypeChoices.TODO)
     board = ForeignKey(Board, CASCADE)
     author = ForeignKey(User, CASCADE)
-
 
     class Meta:
         db_table = 'tasks'
@@ -34,3 +33,8 @@ class Tasks(Model):
 class Subtasks(Model):
     name = CharField(max_length=200)
     task = ForeignKey(Tasks, CASCADE)
+
+
+class Column(Model):
+    name = CharField(max_length=200)
+    board = ForeignKey(Board, CASCADE)
