@@ -23,6 +23,6 @@ from root.swagger import swagger_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('tasks.urls')),
+    path('tasks', include('tasks.urls')),
     path('user', include('users.urls')),
 ] + swagger_urls + static(STATIC_URL, static_root=STATIC_ROOT)

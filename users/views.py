@@ -14,7 +14,7 @@ class UserCreateView(generics.ListCreateAPIView):
     permission_classes = ()
 
 
-class UserDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = UserModel.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [IsAdminUser]
+# class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = UserModel.objects.all()
+#     serializer_class = UserSerializer
+#     permission_classes = [IsAdminUser]
