@@ -65,6 +65,7 @@
 #             return result
 #         return result
 from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 
 from tasks.models import Column, Tasks, Board, Subtasks
 
@@ -100,4 +101,16 @@ class BoardModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Board
+        fields = ('id', 'name', 'columns')
+
+
+class TaskModelSerializer(ModelSerializer):
+    class Meta:
+        model = Tasks
         fields = '__all__'
+
+
+
+
+
+
