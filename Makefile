@@ -7,3 +7,6 @@ run:
 
 admin:
 	python3 manage.py createsuperuser
+
+req:
+	poetry export --without-hashes --format=requirements.txt > requirements.txt
