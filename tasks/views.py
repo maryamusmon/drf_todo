@@ -1,26 +1,24 @@
-from rest_framework import generics
+from rest_framework.generics import ListAPIView
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from .models import Board, Tasks
-from .serializer import BoardModelSerializer, TaskSerializer
+from .models import Board, Tasks, Column
+from .pagination import  TasksResultsSetPagination
+from .serializer import BoardModelSerializer, TaskSerializer, ColumnListModelSerializer
 
-
-class BoardListCreateView(generics.ListCreateAPIView):
-    queryset = Board.objects.all()
-    serializer_class = BoardModelSerializer
 
 class BoardModelViewSet(ModelViewSet):
     queryset = Board.objects.all()
     serializer_class = BoardModelSerializer
-# class BoardRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Board.objects.all()
-#     serializer_class = BoardModelSerializer
-#
+
+
 
 class TaskModelViewSet(ModelViewSet):
     queryset = Tasks.objects.all()
     serializer_class = TaskSerializer
+    pagination_class = TasksResultsSetPagination
 
-# class TasksRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Tasks.objects.all()
-#     serializer_class = TaskSerializer
+
+class ColumnListAPIView(ListAPIView):
+    queryset = Column.objects.all()
+    serializer_class = ColumnListModelSerializer

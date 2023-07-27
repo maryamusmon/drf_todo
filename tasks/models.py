@@ -1,5 +1,8 @@
 from django.contrib.auth.models import User
-from django.db.models import Model, CharField, TextField, ForeignKey, CASCADE, BooleanField
+from django.db.models import Model, CharField, TextField, ForeignKey, CASCADE, BooleanField, ManyToManyField, \
+    TextChoices
+
+from users.models import UserModel
 
 
 class Board(Model):
@@ -15,10 +18,17 @@ class Column(Model):
 
 
 class Tasks(Model):
+    class TypeChoices(TextChoices):
+        HART = 'hart', 'Hart'
+        MEDIUM = 'medium', ' Medium'
+        EASY = 'easy', 'Easy'
+
     title = CharField(max_length=200)
     description = TextField(blank=True, null=True)
+    difficulty = CharField(max_length=220, choices=TypeChoices.choices, default=TypeChoices.EASY)
 
     status = ForeignKey(Column, CASCADE, related_name='tasks')
+    users = ManyToManyField(UserModel)
 
     class Meta:
         db_table = 'tasks'
