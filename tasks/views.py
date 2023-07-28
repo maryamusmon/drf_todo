@@ -44,3 +44,5 @@ class TaskList(ListAPIView):
 class ColumnRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Column.objects.all()
     serializer_class = ColumnSerializer
+
+

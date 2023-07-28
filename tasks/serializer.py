@@ -68,6 +68,7 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
 from tasks.models import Column, Tasks, Board, Subtasks
+from users.models import User
 
 
 class SubtaskSerializer(serializers.ModelSerializer):
@@ -76,8 +77,14 @@ class SubtaskSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'is_completed')
 
 
+class UserTasksModelSerializer(ModelSerializer):
+    model = User
+    fields = ('id', 'username', 'email', 'image')
+
+
 class TaskSerializer(serializers.ModelSerializer):
     subtasks = SubtaskSerializer(many=True)
+    # author = UserTasksModelSerializer(many=True)
 
     class Meta:
         model = Tasks

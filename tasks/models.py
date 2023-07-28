@@ -28,7 +28,7 @@ class Tasks(Model):
     difficulty = CharField(max_length=220, choices=TypeChoices.choices, default=TypeChoices.EASY)
 
     status = ForeignKey(Column, CASCADE, related_name='tasks')
-    author = ManyToManyField(User)
+    author = ManyToManyField(User, related_name='author')
 
     class Meta:
         db_table = 'tasks'
@@ -37,6 +37,10 @@ class Tasks(Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def get_users(self):
+        return self.author_set.all()
 
 
 class Subtasks(Model):
