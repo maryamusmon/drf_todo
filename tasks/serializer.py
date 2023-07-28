@@ -78,17 +78,18 @@ class SubtaskSerializer(serializers.ModelSerializer):
 
 
 class UserTasksModelSerializer(ModelSerializer):
-    model = User
-    fields = ('id', 'username', 'email', 'image')
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'image')
 
 
 class TaskSerializer(serializers.ModelSerializer):
     subtasks = SubtaskSerializer(many=True)
-    # author = UserTasksModelSerializer(many=True)
+    author = UserTasksModelSerializer(many=True)
 
     class Meta:
         model = Tasks
-        fields = ('id', 'title', 'description', 'status', 'difficulty', 'subtasks')
+        fields = ('id', 'title', 'description', 'status', 'difficulty', 'subtasks', 'author')
 
     def get_tasks(self, column):
         tasks = Tasks.objects.filter(status=column.id)
