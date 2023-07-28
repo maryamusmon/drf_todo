@@ -4,7 +4,7 @@ services:
   web_service:
     build:
       context: .
-      dockerfile: compose1/django/Dockerfile
+      dockerfile: ./compose/django/Dockerfile
     ports:
       - 8000:8001
     env_file: .env
@@ -13,6 +13,7 @@ services:
       - media_volume:/app/media
     depends_on:
       - db_service
+      - minio_service
       - redis_service
   #      - rabbitmq
   db_service:
@@ -21,13 +22,23 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     env_file: .env
 
+  minio_service:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    env_file: .env
+    command: server /data --console-address :9001
+    volumes:
+      - minio_data:/data
+
   redis_service:
     image: redis:alpine
 
   nginx:
     build:
       context: .
-      dockerfile: compose1/nginx/Dockerfile
+      dockerfile: ./compose/nginx/Dockerfile
     ports:
       - "80:80"
       - "443:443"
@@ -42,11 +53,67 @@ services:
       - media_volume:/app/media
 
 
+#  rabbitmq:
+#    image: rabbitmq:management
+#    container_name: rabbitmq
+#    environment:
+#      - RABBITMQ_DEFAULT_USER=guest
+#      - RABBITMQ_DEFAULT_PASS=guest
+#    ports:
+#      - 5672:5672
+#      - 15672:15672
+#
+#  celery_worker:
+#    build:
+#      context: .
+#      dockerfile: ./compose/django/Dockerfile
+#    image: celery_worker
+#    command: /start-celeryworker
+#    volumes:
+#      - .:/app
+#    env_file:
+#      - .env
+#    depends_on:
+#      - redis
+#      - rabbitmq
+#      - db
+#
+#  celery_beat:
+#    build:
+#      context: .
+#      dockerfile: ./compose/django/Dockerfile
+#    image: celery_beat
+#    command: /start-celerybeat
+#    volumes:
+#      - .:/app
+#    env_file:
+#      - .env
+#    depends_on:
+#      - redis
+#      - rabbitmq
+#      - db
+#
+#  flower:
+#    build:
+#      context: .
+#      dockerfile: ./compose/django/Dockerfile
+#    image: django_celery_example_celery_flower
+#    command: /start-flower
+#    volumes:
+#      - .:/app
+#    env_file:
+#      - .env
+#    ports:
+#      - 5557:5555
+#    depends_on:
+#      - redis
+#      - db
+
 volumes:
   media_volume:
   static_volume:
   postgres_data:
-
+  minio_data:
 
 
 

@@ -27,7 +27,7 @@ load_dotenv()
 SECRET_KEY = 'django-insecure-e_*y4!l_r8vt4)fvwt9fj%!__+y+oi9sl=b-1cumvl=kma%c&+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -183,7 +183,6 @@ DEFAULTS = {
 
 }
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # SMTP settings
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
