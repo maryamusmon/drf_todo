@@ -4,7 +4,7 @@ services:
   web_service:
     build:
       context: .
-      dockerfile: ./compose/django/Dockerfile
+      dockerfile: compose1/django/Dockerfile
     ports:
       - 8000:8001
     env_file: .env
@@ -27,7 +27,7 @@ services:
   nginx:
     build:
       context: .
-      dockerfile: ./compose/nginx/Dockerfile
+      dockerfile: compose1/nginx/Dockerfile
     ports:
       - "80:80"
       - "443:443"
