@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.db.models import Model, CharField, TextField, ForeignKey, CASCADE, BooleanField, ManyToManyField, \
     TextChoices
 
-from users.models import UserModel
+from users.models import User
 
 
 class Board(Model):
@@ -28,7 +28,7 @@ class Tasks(Model):
     difficulty = CharField(max_length=220, choices=TypeChoices.choices, default=TypeChoices.EASY)
 
     status = ForeignKey(Column, CASCADE, related_name='tasks')
-    users = ManyToManyField(UserModel)
+    author = ManyToManyField(User)
 
     class Meta:
         db_table = 'tasks'

@@ -8,7 +8,7 @@ from tasks.models import Tasks, Subtasks, Board, Column
 
 class TasksInline(StackedInline):
     model = Subtasks
-    max_num = 4
+    max_num = 1000
     fields = ('name',)
 
 
@@ -19,7 +19,7 @@ class ProductsModelAdmin(ModelAdmin):
 
 class BoardInline(StackedInline):
     model = Column
-    max_num = 4
+    max_num = 100
     fields = ('name',)
 
 

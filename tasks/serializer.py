@@ -77,19 +77,11 @@ class SubtaskSerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    # subtasks = SubtaskSerializer(many=True)
+    subtasks = SubtaskSerializer(many=True)
 
     class Meta:
         model = Tasks
-        fields = ('id', 'title', 'description', 'status')
-
-
-class ColumnListModelSerializer(ModelSerializer):
-    tasks = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Column
-        fields = ('id', 'name', 'board', 'tasks')
+        fields = ('id', 'title', 'description', 'status', 'difficulty', 'subtasks')
 
     def get_tasks(self, column):
         tasks = Tasks.objects.filter(status=column.id)
@@ -114,9 +106,3 @@ class BoardModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Board
         fields = ('id', 'name', 'columns')
-
-
-class TaskModelSerializer(ModelSerializer):
-    class Meta:
-        model = Tasks
-        fields = '__all__'

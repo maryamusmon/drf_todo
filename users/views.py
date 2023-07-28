@@ -1,30 +1,79 @@
-from django.shortcuts import render
-from rest_framework import generics
-from rest_framework.permissions import IsAdminUser
+from django.contrib.auth.hashers import make_password
+from rest_framework import status
+from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
+from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView
 
-from users.models import UserModel
-from users.serializers import UserSerializer
+from users.models import User
+from users.serializers import RegisterUserModelSerializer, CheckActivationSerializer, SendEmailResetSerializer, \
+    UserListModelSerializer
+from users.serializers import PasswordResetConfirmSerializer
 
 
 # Create your views here.
-class UserCreateView(generics.ListCreateAPIView):
-    queryset = UserModel.objects.all()
-    serializer_class = UserSerializer
 
-    permission_classes = ()
+class UserTokenObtainPairView(TokenObtainPairView):
+    parser_classes = (FormParser, MultiPartParser)
 
 
-# class UserDetail(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = UserModel.objects.all()
-#     serializer_class = UserSerializer
-#     permission_classes = [IsAdminUser]
+class UserTokenRefreshView(TokenRefreshView):
+    parser_classes = (FormParser, MultiPartParser)
 
 
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework.permissions import AllowAny
-from .serializers import MyTokenObtainPairSerializer
+class UserTokenVerifyView(TokenVerifyView):
+    parser_classes = (FormParser, MultiPartParser)
 
 
-class MyObtainTokenPairView(TokenObtainPairView):
+class RegisterUserCreateAPIView(CreateAPIView):
+    serializer_class = RegisterUserModelSerializer
+    parser_classes = (FormParser, MultiPartParser)
     permission_classes = (AllowAny,)
-    serializer_class = MyTokenObtainPairSerializer
+
+
+class ActivationUserGenericAPIView(GenericAPIView):
+    parser_classes = (FormParser, MultiPartParser)
+    serializer_class = CheckActivationSerializer
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = User.objects.get(email=serializer.validated_data.get('email'))
+        user.is_active = True
+        user.save(update_fields=["is_active"])
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class PasswordResetGenericAPIView(GenericAPIView):
+    serializer_class = SendEmailResetSerializer
+    parser_classes = (FormParser, MultiPartParser)
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data.get('email')
+        return Response({'email': email}, status=status.HTTP_200_OK)
+
+
+class PasswordResetConfirmUpdateAPIView(GenericAPIView):
+    serializer_class = PasswordResetConfirmSerializer
+    parser_classes = (FormParser, MultiPartParser)
+    permission_classes = (AllowAny,)
+
+    def patch(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        password = serializer.validated_data.get('new_password')
+        user = User.objects.get(email=serializer.validated_data.get('email'))
+        user.password = make_password(password)
+        user.save(update_fields=["password"])
+        return Response(status=status.HTTP_200_OK)
+
+
+class UserListAPIView(ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserListModelSerializer
+    permission_classes = (AllowAny,)

@@ -1,14 +1,13 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 
-from tasks.views import TaskModelViewSet, BoardModelViewSet, ColumnListAPIView
+from tasks.views import BoardListCreateAPIView,BoardRetrieveUpdateDestroyAPIView,TaskRetrieveUpdateDestroyAPIView, TaskList, ColumnRetrieveUpdateDestroyAPIView
 
-router = DefaultRouter(trailing_slash=False)
-router.register('task', TaskModelViewSet)
-router.register('board', BoardModelViewSet)
+
 urlpatterns = [
-    path('', include(router.urls)),
-    path('column/', ColumnListAPIView.as_view())
-    # path('board/', BoardListCreateView.as_view()),
+    path('board', BoardListCreateAPIView.as_view()),
+    path('board/<int:pk>', BoardRetrieveUpdateDestroyAPIView.as_view()),
+    path('task/<int:pk>', TaskRetrieveUpdateDestroyAPIView.as_view()),
+    path('column/<int:pk>', ColumnRetrieveUpdateDestroyAPIView.as_view()),
+    path('todolist/<int:pk>', TaskList.as_view()),
 
 ]

@@ -1,68 +1,91 @@
-from django.contrib.auth import authenticate
+from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
+from django.core import exceptions as django_exceptions
+
+from rest_framework.settings import api_settings
+from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
-from users.models import UserModel
+
+from users.services.cache_function import getKey, deleteKey
+from users.services.email import ActivationEmail
+
+User = get_user_model()
 
 
-class UserSerializer(serializers.ModelSerializer):
+class RegisterUserModelSerializer(ModelSerializer):
+    re_password = serializers.CharField(max_length=100, write_only=True)
+    password = serializers.CharField(max_length=100, write_only=True)
+
     class Meta:
-        model = UserModel
-        fields = ("first_name", "last_name", "email", "password")
-        extra_kwargs = {
-            "password": {
-                "write_only": True,
-                "min_length": 1
-            }
-        }
+        model = User
+        fields = tuple(User.REQUIRED_FIELDS) + ('username', 'password', 're_password')
+
+    def check_password_macht(self, **kwargs):
+        if kwargs.get("password") != kwargs.get("re_password"):
+            raise serializers.ValidationError({"password_mismatch": 'error_messages.PASSWORD_MISMATCH_ERROR'})
+        return True
+
+    def validate(self, attrs):
+        if self.check_password_macht(**attrs):
+            attrs.pop('re_password')
+            try:
+                user = User(**attrs)
+                validate_password(attrs.get('password'), user)
+            except django_exceptions.ValidationError as e:
+                serializer_error = serializers.as_serializer_error(e)
+                raise serializers.ValidationError(
+                    {"password": serializer_error[api_settings.NON_FIELD_ERRORS_KEY]}
+                )
+        return attrs
 
     def create(self, validated_data):
-        user = UserModel(
-            first_name=validated_data["first_name"],
-            last_name=validated_data["last_name"],
-            email=validated_data["email"]
-        )
-        user.set_password(validated_data["password"])
-        user.save()
-
+        user = User.objects.create_user(**validated_data)
+        self.context['user'] = user
+        ActivationEmail(self.context.get('request'), self.context).send([user.email])
         return user
 
 
-class AuthTokenSerializer(serializers.Serializer):
-    email = serializers.CharField()
-    password = serializers.CharField(
-        style={
-            "input_tye": "password"
-        },
-        trim_whitespace=False
-    )
+class CheckActivationSerializer(serializers.Serializer):
+    activation_code = serializers.IntegerField(write_only=True)
+    email = serializers.EmailField(write_only=True)
 
     def validate(self, attrs):
-        email = attrs.get("email")
-        password = attrs.get("password")
-
-        user = authenticate(
-            request=self.context.get("request"),
-            email=email,
-            password=password
-        )
-        if not user:
-            raise serializers.ValidationError(
-                "Unable to authenticate with provided credentials",
-                code="authentication"
-            )
-
-        attrs["user"] = user
+        if getKey(attrs.get('email')) != attrs.get('activation_code'):
+            raise serializers.ValidationError({"invalid_code": 'error_messages.INVALID_ACTIVATE_CODE_ERROR'})
+        deleteKey(attrs.get('email'))
         return attrs
 
 
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+class PasswordResetConfirmSerializer(CheckActivationSerializer):
+    new_password = serializers.CharField(max_length=150, write_only=True)
+
+    def validate(self, attrs):
+        try:
+            user = User.objects.get(email=attrs.get('email'))
+            validate_password(attrs.get('new_password'), user)
+        except django_exceptions.ValidationError as e:
+            serializer_error = serializers.as_serializer_error(e)
+            raise serializers.ValidationError(
+                {"password": serializer_error[api_settings.NON_FIELD_ERRORS_KEY]}
+            )
+
+        return super().validate(attrs)
 
 
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+class SendEmailResetSerializer(serializers.Serializer):
+    email = serializers.EmailField(write_only=True)
 
-    @classmethod
-    def get_token(cls, user):
-        token = super(MyTokenObtainPairSerializer, cls).get_token(user)
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if not User.objects.filter(email=attrs.get('email')).exists():
+            raise serializers.ValidationError({"email": 'error_messages.EMAIL_NOT_FOUND'})
+        user = User.objects.get(email=attrs.get('email'))
+        self.context['user'] = user
+        ActivationEmail(self.context.get('request'), self.context).send([user.email])
+        return attrs
 
-        # Add custom claims
-        token['username'] = user.username
-        return token
+
+class UserListModelSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = '__all__'
