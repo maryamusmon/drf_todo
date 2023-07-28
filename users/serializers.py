@@ -88,4 +88,4 @@ class SendEmailResetSerializer(serializers.Serializer):
 class UserListModelSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ('id', 'email', 'username', 'image', 'is_active', 'created_at')

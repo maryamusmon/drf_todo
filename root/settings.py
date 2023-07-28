@@ -27,7 +27,7 @@ load_dotenv()
 SECRET_KEY = 'django-insecure-e_*y4!l_r8vt4)fvwt9fj%!__+y+oi9sl=b-1cumvl=kma%c&+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     # DRF
     'rest_framework',
     'drf_yasg',
-    'django_filters'
+    'django_filters',
 ]
 
 MIDDLEWARE = [
