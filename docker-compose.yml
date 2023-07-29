@@ -25,22 +25,6 @@ services:
   redis_service:
     image: redis:alpine
 
-  nginx:
-    build:
-      context: .
-      dockerfile: ./compose/nginx/Dockerfile
-    ports:
-      - "80:80"
-    depends_on:
-      - web_service
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "3"
-    volumes:
-      - static_volume:/app/static
-      - media_volume:/app/media
-
 
 volumes:
   media_volume:
