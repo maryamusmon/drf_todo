@@ -13,24 +13,14 @@ services:
       - media_volume:/app/media
     depends_on:
       - db_service
-      - minio_service
       - redis_service
-  #      - rabbitmq
+
   db_service:
     image: postgres:15-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file: .env
 
-  minio_service:
-    image: minio/minio
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    env_file: .env
-    command: server /data --console-address :9001
-    volumes:
-      - minio_data:/data
 
   redis_service:
     image: redis:alpine
@@ -41,7 +31,6 @@ services:
       dockerfile: ./compose/nginx/Dockerfile
     ports:
       - "80:80"
-      - "443:443"
     depends_on:
       - web_service
     logging:
@@ -57,28 +46,3 @@ volumes:
   media_volume:
   static_volume:
   postgres_data:
-  minio_data:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

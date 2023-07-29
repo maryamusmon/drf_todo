@@ -5,11 +5,13 @@ django-templated-mail==1.1.1
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
 drf-yasg==1.21.7
+gunicorn==21.2.0
 inflection==0.5.1
 iniconfig==2.0.0
 packaging==23.1
 Pillow==10.0.0
 pluggy==1.2.0
+psycopg2-binary==2.9.6
 PyJWT==2.8.0
 pytest==7.4.0
 pytest-django==4.5.2
