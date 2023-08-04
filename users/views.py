@@ -1,30 +1,22 @@
 from django.contrib.auth.hashers import make_password
 from rest_framework import status
-from rest_framework.parsers import FormParser, MultiPartParser
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
-from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView
+from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.generics import CreateAPIView, GenericAPIView, RetrieveAPIView
 
 from users.models import User
-from users.serializers import RegisterUserModelSerializer, CheckActivationSerializer, SendEmailResetSerializer, \
-    UserListModelSerializer
 from users.serializers import PasswordResetConfirmSerializer
+from users.serializers import (
+    RegisterUserModelSerializer,
+    CheckActivationSerializer,
+    SendEmailResetSerializer,
+    UserListModelSerializer,
+    UserRetrieveSerializer
+)
 
 
 # Create your views here.
-
-class UserTokenObtainPairView(TokenObtainPairView):
-    parser_classes = (FormParser, MultiPartParser)
-
-
-class UserTokenRefreshView(TokenRefreshView):
-    parser_classes = (FormParser, MultiPartParser)
-
-
-class UserTokenVerifyView(TokenVerifyView):
-    parser_classes = (FormParser, MultiPartParser)
-
 
 class RegisterUserCreateAPIView(CreateAPIView):
     serializer_class = RegisterUserModelSerializer
@@ -44,7 +36,6 @@ class ActivationUserGenericAPIView(GenericAPIView):
         user.is_active = True
         user.save(update_fields=["is_active"])
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 class PasswordResetGenericAPIView(GenericAPIView):
     serializer_class = SendEmailResetSerializer
@@ -73,7 +64,20 @@ class PasswordResetConfirmUpdateAPIView(GenericAPIView):
         return Response(status=status.HTTP_200_OK)
 
 
-class UserListAPIView(ListAPIView):
+class UserGenericAPIView(GenericAPIView):
     queryset = User.objects.all()
     serializer_class = UserListModelSerializer
-    permission_classes = (AllowAny,)
+
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+
+class UserRetrieveAPIView(RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserRetrieveSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
