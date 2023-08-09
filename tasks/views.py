@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from users.models import User
-from .models import Board, Tasks, Column, Subtasks
+from .models import Board, Tasks, Column, Subtasks, AuthorTask
 from .serializer import BoardModelSerializer, TaskSerializer, ColumnSerializer, TaskCreateModelSerializer
 
 column_param = openapi.Parameter(
@@ -63,6 +63,7 @@ class TaskRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Tasks.objects.all()
     serializer_class = TaskSerializer
 
+
 class TaskList(ListAPIView):
     queryset = Tasks.objects.all()
     serializer_class = TaskSerializer
@@ -102,9 +103,14 @@ class TaskCreateAPIView(CreateAPIView, GenericViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         task = serializer.save()
-        # for i in request.data.get('author'):
-        #     if User.objects.filter(email=i).exists():
-        #         Tasks.author.create(task=task, user=User.objects.filter(email=i))
+        author_task = []
+        if author := request.data.get('author'):
+            for i in author.split(','):
+                if User.objects.filter(email=i).exists():
+                    user = User.objects.filter(email=i).first()
+                    author_task.append(AuthorTask(task=task, author=user))
+            AuthorTask.objects.bulk_create(author_task)
+
         if li := request.data.get('subtasks'):
             res = [Subtasks(name=i, task=task) for i in li.split(',')]
             Subtasks.objects.bulk_create(res)

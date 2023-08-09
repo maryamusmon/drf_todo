@@ -71,6 +71,7 @@ class PasswordResetConfirmSerializer(CheckActivationSerializer):
 
         return super().validate(attrs)
 
+
 class SendEmailResetSerializer(serializers.Serializer):
     email = serializers.EmailField(write_only=True)
 
@@ -88,6 +89,7 @@ class UserListModelSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'email', 'username', 'image', 'is_active', 'created_at')
+
 
 class UserRetrieveSerializer(serializers.ModelSerializer):
     class Meta:

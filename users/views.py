@@ -16,7 +16,6 @@ from users.serializers import (
 )
 
 
-# Create your views here.
 
 class RegisterUserCreateAPIView(CreateAPIView):
     serializer_class = RegisterUserModelSerializer
