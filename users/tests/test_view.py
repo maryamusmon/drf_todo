@@ -1,3 +1,4 @@
+
 import pytest
 from django.urls import reverse
 from rest_framework import status
@@ -5,8 +6,8 @@ from rest_framework.test import APIClient
 from users.services.cache_function import getKey, setKey
 
 
+@pytest.mark.django_db
 class TestActivationUserGenericAPIView:
-    pytestmark = pytest.mark.django_db
     activate_code = ''
     client = APIClient()
     payload = dict(
@@ -23,15 +24,16 @@ class TestActivationUserGenericAPIView:
 
     }
 
+    @pytest.fixture
     def test_user_register(self):
         response = self.client.post(self.urls.get('register'), self.payload)
 
         data = response.data
+        assert response.status_code == status.HTTP_201_CREATED
         assert "password" not in data
         assert data["email"] == self.payload["email"]
 
-    def test_user_activation(self):
-        setKey(self.payload.get('email'), '123456')
+    def test_user_activation(self, test_user_register):
         data = {
             'email': self.payload.get('email'),
             'activation_code': getKey(self.payload.get('email'))
