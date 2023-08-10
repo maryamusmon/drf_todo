@@ -16,7 +16,6 @@ from users.serializers import (
 )
 
 
-
 class RegisterUserCreateAPIView(CreateAPIView):
     serializer_class = RegisterUserModelSerializer
     parser_classes = (FormParser, MultiPartParser)
@@ -35,6 +34,7 @@ class ActivationUserGenericAPIView(GenericAPIView):
         user.is_active = True
         user.save(update_fields=["is_active"])
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class PasswordResetGenericAPIView(GenericAPIView):
     serializer_class = SendEmailResetSerializer
