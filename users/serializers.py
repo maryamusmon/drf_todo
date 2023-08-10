@@ -98,4 +98,5 @@ class UserRetrieveSerializer(serializers.ModelSerializer):
             'id', 'image',
             'first_name', 'last_name',
             'email', 'username', 'phone',
-            'is_active', 'created_at')
+            'is_active', 'created_at'
+        )
