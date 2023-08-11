@@ -1,4 +1,3 @@
-
 import pytest
 from django.urls import reverse
 from rest_framework import status
@@ -59,7 +58,6 @@ class TestActivationUserGenericAPIView:
         else:
             assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-
     def test_user_reset_password_confirm(self, test_user_reset_password):
         data = {
             'email': self.payload.get('email'),
@@ -70,6 +68,3 @@ class TestActivationUserGenericAPIView:
 
         response = self.client.patch(self.urls.get("reset_password_confirm"), data)
         assert response.status_code == status.HTTP_200_OK
-
-
-
