@@ -12,8 +12,8 @@ from tasks.views import (
 )
 
 router = DefaultRouter()
-router.register('boards', BoardListCreateAPIView, basename='boards')
-router.register('task', TaskCreateAPIView, basename='task')
+router.register(r'boards', BoardListCreateAPIView, basename='board')
+router.register(r'task', TaskCreateAPIView, basename='task')
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -22,4 +22,6 @@ urlpatterns = [
     path('column/create', ColumnCreateAPIView.as_view()),
     path('column/<int:pk>', ColumnRetrieveUpdateDestroyAPIView.as_view()),
     path('task/list/<int:pk>', TaskList.as_view()),
+    # path('board_list', BoardListCreateAPIView.as_view(), name='board'),
+    # path('task_create', TaskCreateAPIView.as_view(), name='task')
 ]
