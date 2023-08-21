@@ -130,8 +130,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        # "LOCATION": "redis://redis_service:6379",
-        "LOCATION": "redis://localhost:6379",
+        "LOCATION": "redis://redis_service:6379",
+        # "LOCATION": "redis://localhost:6379",
     }
 }
 
